@@ -8,7 +8,15 @@ const AuthContext = React.createContext({
     logout: () => { }
 });
 
+const calculateRemainingTime = (expirationTime) => {
+    const currentTime = new Date().getTime();
+    const adjExpirationTime = new Date(expirationTime).getTime();
+    const remainingDuration = adjExpirationTime - currentTime;
+    return remainingDuration;
+};
+
 export const AuthContextProvider = (props) => {
+    // when the app starts, we will look into our local storage to find a token there and if we find token there, we will use that token for authenticating the user automatically. hence, we will initialize our state with that 'token' instead of providing 'null' as a starting value.
     const initialToken = localStorage.getItem('token');
 
     // managing state for auth data
@@ -19,18 +27,21 @@ export const AuthContextProvider = (props) => {
     const userIsLoggedIn = !!token;
 
     // funtions for changing token state.
-    const loginHandler = (token) => {
-        // storing token in the state.
-        setToken(token);
-        // storing token in the browser storage if user logs in. 
-        localStorage.setItem('token', token);
-    };
-
     const logoutHandler = () => {
         setToken(null);
         localStorage.removeItem('token');
         // to clear all the data
         // localStorage.clear();
+    };
+
+    const loginHandler = (token, expirationTime) => {
+        // storing token in the state.
+        setToken(token);
+        // storing token in the browser storage if user logs in. 
+        localStorage.setItem('token', token);
+        const remainingTime = calculateRemainingTime(expirationTime);
+
+        setTimeout(logoutHandler, remainingTime);
     };
 
     const contextValue = {

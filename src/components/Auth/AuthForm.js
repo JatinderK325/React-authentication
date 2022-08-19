@@ -72,7 +72,8 @@ const AuthForm = () => {
     }).then((data) => {
       // if no error
       // console.log(data);
-      authCtx.login(data.idToken);
+      const expirationTime = new Date(new Date().getTime() + (+data.expiresIn * 1000));
+      authCtx.login(data.idToken, expirationTime.toISOString());
       // hence we do have a token and we do logged the user in.
       // redirecting the user to the starting page after the successful response.
       history.replace('/');
