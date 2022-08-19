@@ -1,9 +1,11 @@
 import { useState, useRef, useContext } from 'react';
 import AuthContext from '../../store/auth-context';
+import { useHistory } from 'react-router-dom';
 
 import classes from './AuthForm.module.css';
 
 const AuthForm = () => {
+  const history = useHistory();
   const authCtx = useContext(AuthContext);
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -38,9 +40,10 @@ const AuthForm = () => {
       {
         method: 'POST',
         body: JSON.stringify({
+          // this is a body payload required by 'firebase auth rest api'.
           email: enteredEmail,
           password: enteredPassword,
-          returnSecureToken: true
+          returnSecureToken: true // will return a new token
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -70,6 +73,9 @@ const AuthForm = () => {
       // if no error
       // console.log(data);
       authCtx.login(data.idToken);
+      // hence we do have a token and we do logged the user in.
+      // redirecting the user to the starting page after the successful response.
+      history.replace('/');
     }).catch(err => {
       // if error
       alert(err.message);
